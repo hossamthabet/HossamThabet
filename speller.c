@@ -13,6 +13,7 @@
 
 // hash table size = 2^16
 const int HASHTABLE_SIZE = 65536;
+int count = 0;
 // Represents a node in a hash table
 typedef struct node
 {
@@ -38,15 +39,8 @@ unsigned int hash(const char *word)
 bool check(const char *word)
 {
 
-    char lcword[LENGTH+1];
-
-    // convert to lowercase, as we need this to lookup. TODO: change from length to length of word
-    for (int i = 0; i < LENGTH; i++)
-    {
-        lcword[i] = tolower(word[i]);
-    }
     // make traverse node equal to the speciefic linked list
-    node *trav = table[hash(lcword)];
+    node *trav = table[hash(word)];
 
     while (trav != NULL)
     {
@@ -57,17 +51,14 @@ bool check(const char *word)
     trav = trav->next;
     }
         return false;
-
 }
-
-
 
 // Loads dictionary into memory, returning true if successful else false
 bool load(const char *dictionary)
 {
+    
     // initialise word
-    char word[LENGTH+1];
-
+    char *word[LENGTH+1];
     // open the dictionary
     FILE *file = fopen(dictionary, "r");
 
@@ -84,7 +75,7 @@ bool load(const char *dictionary)
         // break out when reach the EOF
         if (feof(file))
         {
-            return false;
+            break;
         }
         fscanf(file, "%s", word);
         // declare new node
@@ -96,43 +87,25 @@ bool load(const char *dictionary)
             strcpy(new_node->word,word);
             // call the hash function to determine the N number
            int N = hash(new_node->word);
-
+           count++;
         // insert the new_node in the table index
         new_node->next = table[N];
         table[N] = new_node;
-
-        }else
+        }
+        else
         {
             unload();
             return false;
         }
-
     }
-
     // close dictionary
     fclose(file);
-
     return true;
 }
 
 // Returns number of words in dictionary if loaded else 0 if not yet loaded
 unsigned int size(void)
 {
-    int count = 0;
-
-    // iterate through hashtable
-    for (int i = 0; i < HASHTABLE_SIZE; i++)
-    {
-        // set pointer to head of list
-        node *cursor = table[i];
-
-        // traverse list
-        while (cursor != NULL)
-        {
-            count++;
-            cursor = cursor->next;
-        }
-    }
     return count;
 }
 
@@ -143,14 +116,12 @@ bool unload(void)
     {
         // set pointer to head of list
         node *cursor = table[i];
-
     while (cursor != NULL)
     {
         //make temp node to free memory
         node *temp = cursor;
         cursor = cursor->next;
         free(temp);
-
     }
     free(cursor);
     }
