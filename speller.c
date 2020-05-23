@@ -1,4 +1,4 @@
-https://submit.cs50.io/check50/20891ab92e46e07adc472c6332773e38e484b071
+
 // Implements a dictionary's functionality
 #include <ctype.h>
 
